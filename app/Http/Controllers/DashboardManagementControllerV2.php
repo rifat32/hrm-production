@@ -2029,7 +2029,7 @@ class DashboardManagementControllerV2 extends Controller
                                                             ->orWhere('trail_end_date', now()->toDateString());
                                                     });
                                             })
-                                            ->orWhereHas('subscriptions', function ($subQuery) {
+                                            ->orWhereHas('subscription', function ($subQuery) {
                                                 $subQuery->where(function ($subscriptionQuery) {
                                                     $subscriptionQuery->where('start_date', '<=', now())
                                                         ->where(function ($endDateQuery) {
@@ -2048,23 +2048,23 @@ class DashboardManagementControllerV2 extends Controller
                                 // Check for automatically subscribed businesses
                                 $q->where(function ($innerQuery) {
                                     $innerQuery->where('is_self_registered_businesses', 0)
-                                        ->whereNull('trail_end_date') // Check for null or empty trail_end_date
+                                        ->whereNull('trail_end_date')
                                         ->orWhere(function ($trailQuery) {
                                             $trailQuery->whereNotNull('trail_end_date')
                                                 ->where('trail_end_date', '<', now())
-                                                ->whereNot('trail_end_date', now()->toDateString());
+                                                ->where('trail_end_date', '!=', now()->toDateString());
                                         });
                                 })
                                 ->orWhere(function ($q) {
                                     // Check for self-registered businesses
                                     $q->where('is_self_registered_businesses', 1)
                                         ->where(function ($innerQuery) {
-                                            $innerQuery->whereNull('trail_end_date') // Check for null or empty trail_end_date
+                                            $innerQuery->whereNull('trail_end_date')
                                                 ->orWhere(function ($trailQuery) {
                                                     $trailQuery->whereNotNull('trail_end_date')
                                                         ->where('trail_end_date', '<', now())
-                                                        ->whereNot('trail_end_date', now()->toDateString())
-                                                        ->whereDoesntHave('subscriptions', function ($subQuery) {
+                                                        ->where('trail_end_date', '!=', now()->toDateString())
+                                                        ->whereDoesntHave('subscription', function ($subQuery) {
                                                             $subQuery->where('start_date', '<=', now())
                                                                 ->where(function ($endDateQuery) {
                                                                     $endDateQuery->whereNull('end_date')
@@ -2076,61 +2076,10 @@ class DashboardManagementControllerV2 extends Controller
                                 });
                             });
                     }
-
-
                 });
             });
 
-        // Total count
-        $data["total"] = (clone $data_query)->count();
-
-        // Total count for today's date
-        $data["today"] = (clone $data_query)
-            ->whereDate("created_at", $today)
-            ->count();
-
-        // Monthly data
-        $data["monthly"]["this_month"] = (clone $data_query)
-            ->whereBetween("created_at", [
-                $start_date_of_this_month,
-                $end_date_of_this_month
-            ])->count();
-
-        $data["monthly"]["previous_month"] = (clone $data_query)
-            ->whereBetween("created_at", [
-                $start_date_of_previous_month,
-                $end_date_of_previous_month
-            ])->count();
-
-        // Weekly data
-        $data["weekly"]["this_week"] = (clone $data_query)
-            ->whereBetween("created_at", [
-                $start_date_of_this_week,
-                $end_date_of_this_week
-            ])->count();
-
-        $data["weekly"]["previous_week"] = (clone $data_query)
-            ->whereBetween("created_at", [
-                $start_date_of_previous_week,
-                $end_date_of_previous_week
-            ])->count();
-
-        // Calculate businesses expiring within 15, 30, or 60 days
-        if ($is_active === null) {
-            $expires_in_days = [15, 30, 60];
-            $data['expires'] = [];
-
-            foreach ($expires_in_days as $days) {
-                $expirationDate = now()->addDays($days);
-                $data['expires'][$days] = (clone $data_query)
-                    ->whereHas('subscriptions', function ($query) use ($expirationDate) {
-                        $query->where('end_date', $expirationDate->toDateString());
-                    })
-                    ->count();
-            }
-        }
-
-        return $data;
+        return $data_query->get();
     }
 
 
@@ -3770,7 +3719,7 @@ class DashboardManagementControllerV2 extends Controller
 
 
         // Get last 12 months dates
-        $months = $this->getLast12MonthsDates(request()->inut("year"));
+        $months = $this->getLast12MonthsDates(request()->input("year"));
 
         // Fetch businesses for each month directly
         $chart_data = [];
