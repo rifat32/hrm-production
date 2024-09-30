@@ -3679,7 +3679,7 @@ class DashboardManagementControllerV2 extends Controller
                 $start_date_of_previous_week,
                 $end_date_of_previous_week,
 
-            );
+            )->count();
 
             $data["active_businesses"] = $this->businesses(
                 $today,
@@ -3697,7 +3697,7 @@ class DashboardManagementControllerV2 extends Controller
                 $end_date_of_previous_week,
                 1
 
-            );
+            )->count();
 
             $data["deactive_businesses"] = $this->businesses(
                 $today,
@@ -3715,7 +3715,7 @@ class DashboardManagementControllerV2 extends Controller
                 $end_date_of_previous_week,
                 0
 
-            );
+            )->count();
 
 
         // Get last 12 months dates
