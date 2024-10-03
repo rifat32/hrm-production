@@ -2700,39 +2700,8 @@ class UserManagementController extends Controller
                 "id" => $request["id"]
             ]);
             $updatableUser = $userQuery->first();
-            if ($updatableUser->hasRole("superadmin") && $request["role"] != "superadmin") {
-                return response()->json([
-                    "message" => "You can not change the role of super admin"
-                ], 401);
-            }
-            if (!$request->user()->hasRole('superadmin') && $updatableUser->business_id != auth()->user()->business_id && $updatableUser->created_by != $request->user()->id) {
-                return response()->json([
-                    "message" => "You can not update this user"
-                ], 401);
-            }
 
-
-            if (!empty($request_data['password'])) {
-                $request_data['password'] = Hash::make($request_data['password']);
-            } else {
-                unset($request_data['password']);
-            }
-
-            $userQueryTerms = [
-                "id" => $request_data["id"],
-            ];
-
-
-            $user = User::where($userQueryTerms)->first();
-
-            if ($user) {
-                $user->fill(collect($request_data)->only([
-                    'password',
-                ])->toArray());
-
-                $user->save();
-            }
-            if (!$user) {
+            if (!$updatableUser) {
 
                 return response()->json([
                     "message" => "no user found"
@@ -2742,10 +2711,67 @@ class UserManagementController extends Controller
 
 
 
-            $user->roles = $user->roles->pluck('name');
+            if(empty(auth()->user()->business_id)) {
+                if(empty($userQuery->business_id)) {
+                    if(!auth()->user()->hasRole("super_admin")) {
+                        throw new Exception("you can not update this user's password");
+                    }
+
+                }else {
+                    $business = Business::where([
+                        "id" => $updatableUser->business_id
+                    ])
+                    ->first();
+
+                    if($business->reseller_id !== auth()->user()->id) {
+                        throw new Exception("you can not update this user's password");
+                    }
+                }
 
 
-            return response($user, 201);
+            } else {
+                $all_manager_department_ids = $this->get_all_departments_of_manager();
+
+                $verifiedUser = User::where([
+                    "id" => $updatableUser->id
+                ])
+                ->whereHas("department_user.department", function ($query) use ($all_manager_department_ids) {
+                    $query->whereIn("departments.id", $all_manager_department_ids);
+                })
+                ->first();
+
+                if(empty($verifiedUser)) {
+                    throw new Exception("you can not update this user's password");
+                }
+
+            }
+
+
+            if (!empty($request_data['password'])) {
+                $request_data['password'] = Hash::make($request_data['password']);
+            } else {
+                unset($request_data['password']);
+            }
+
+
+
+
+
+            if ($updatableUser) {
+                $updatableUser->fill(collect($request_data)->only([
+                    'password',
+                ])->toArray());
+
+                $updatableUser->save();
+            }
+
+
+
+
+            $updatableUser->roles = $updatableUser->roles->pluck('name');
+
+
+            return response($updatableUser, 201);
         } catch (Exception $e) {
             error_log($e->getMessage());
             return $this->sendError($e, 500, $request);

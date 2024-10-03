@@ -294,6 +294,7 @@ Route::middleware(['auth:api',"mail.setting", "business.subscription.check", "au
 
 
     Route::patch('/auth/changepassword', [AuthController::class, "changePassword"]);
+    
     Route::put('/v1.0/update-user-info', [AuthController::class, "updateUserInfo"]);
 
 
