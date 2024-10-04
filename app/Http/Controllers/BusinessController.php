@@ -818,6 +818,7 @@ class BusinessController extends Controller
             $request_data['user']['postcode'] = $request_data['business']['postcode'];
             $request_data['user']['lat'] = $request_data['business']['lat'];
             $request_data['user']['long'] = $request_data['business']['long'];
+            
             $user  =  tap(User::where([
                 "id" => $request_data['user']["id"]
             ]))->update(

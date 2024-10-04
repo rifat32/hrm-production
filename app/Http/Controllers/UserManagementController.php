@@ -2696,13 +2696,12 @@ class UserManagementController extends Controller
 
 
 
-            $userQuery = User::where([
+            $updatableUser = User::where([
                 "id" => $request["id"]
-            ]);
-            $updatableUser = $userQuery->first();
+            ])->first();
+
 
             if (!$updatableUser) {
-
                 return response()->json([
                     "message" => "no user found"
                 ], 404);
@@ -2712,19 +2711,20 @@ class UserManagementController extends Controller
 
 
             if(empty(auth()->user()->business_id)) {
+
                 if(empty($userQuery->business_id)) {
                     if(!auth()->user()->hasRole("super_admin")) {
-                        throw new Exception("you can not update this user's password");
+                        throw new Exception("you can not update this user's password" . $updatableUser->business_id,401);
                     }
 
-                }else {
+                } else {
                     $business = Business::where([
                         "id" => $updatableUser->business_id
                     ])
                     ->first();
 
                     if($business->reseller_id !== auth()->user()->id) {
-                        throw new Exception("you can not update this user's password");
+                        throw new Exception("you can not update this user's password",401);
                     }
                 }
 
@@ -2741,7 +2741,7 @@ class UserManagementController extends Controller
                 ->first();
 
                 if(empty($verifiedUser)) {
-                    throw new Exception("you can not update this user's password");
+                    throw new Exception("you can not update this user's password",401);
                 }
 
             }
