@@ -2714,7 +2714,7 @@ class UserManagementController extends Controller
 
                 if(empty($userQuery->business_id)) {
                     if(!auth()->user()->hasRole("super_admin")) {
-                        throw new Exception("you can not update this user's password" . $updatableUser->business_id,401);
+                        throw new Exception("you can not update this user's password",401);
                     }
 
                 } else {
