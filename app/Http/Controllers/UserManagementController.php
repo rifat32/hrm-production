@@ -2711,12 +2711,10 @@ class UserManagementController extends Controller
 
 
             if(empty(auth()->user()->business_id)) {
-
                 if(empty($userQuery->business_id)) {
                     if(!auth()->user()->hasRole("super_admin")) {
                         throw new Exception("you can not update this user's password",401);
                     }
-
                 } else {
                     $business = Business::where([
                         "id" => $updatableUser->business_id

@@ -77,6 +77,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -384,6 +385,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -542,6 +544,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+          * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -690,6 +693,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+          * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -818,7 +822,7 @@ class BusinessController extends Controller
             $request_data['user']['postcode'] = $request_data['business']['postcode'];
             $request_data['user']['lat'] = $request_data['business']['lat'];
             $request_data['user']['long'] = $request_data['business']['long'];
-            
+
             $user  =  tap(User::where([
                 "id" => $request_data['user']["id"]
             ]))->update(
@@ -862,6 +866,7 @@ class BusinessController extends Controller
                 "about",
                 "web_page",
                 "identifier_prefix",
+                "enable_auto_business_setup",
                 "phone",
                 "email",
                 "additional_information",
@@ -1424,6 +1429,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -1533,6 +1539,7 @@ class BusinessController extends Controller
                 "about",
                 "web_page",
                 "identifier_prefix",
+                "enable_auto_business_setup",
                 "phone",
                 "email",
                 "additional_information",
@@ -1601,6 +1608,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -1712,7 +1720,8 @@ class BusinessController extends Controller
                 "postcode",
                 "start_date",
                 "web_page",
-                "identifier_prefix"
+                "identifier_prefix",
+                "enable_auto_business_setup",
 
 
             ])->toArray());
@@ -1781,6 +1790,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
      *  "phone":"01771034383",
@@ -2211,6 +2221,7 @@ class BusinessController extends Controller
      * "about":"Best businesses in Dhaka",
      * "web_page":"https://www.facebook.com/",
      * "identifier_prefix":"identifier_prefix",
+     * "enable_auto_business_setup":"enable_auto_business_setup",
      *
      *  "phone":"01771034383",
      *  "email":"rifatalashwad@gmail.com",
@@ -2297,6 +2308,7 @@ class BusinessController extends Controller
                 "about",
                 "web_page",
                 "identifier_prefix",
+                "enable_auto_business_setup",
                 "phone",
                 "email",
                 "additional_information",
@@ -2897,7 +2909,20 @@ class BusinessController extends Controller
                     });
                 },
             )
-            ->select("id", "name", "email", "phone", "address_line_1", "city", "country", "postcode", "start_date", "web_page",    'identifier_prefix',"reseller_id")
+            ->select("id",
+            "name",
+            "email",
+            "phone",
+            "address_line_1",
+            "city",
+            "country",
+
+            "postcode",
+            "start_date",
+             "web_page",
+            'identifier_prefix',
+            'enable_auto_business_setup',
+            "reseller_id")
             ->first();
 
 

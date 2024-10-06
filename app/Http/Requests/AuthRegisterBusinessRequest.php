@@ -70,6 +70,8 @@ class AuthRegisterBusinessRequest extends BaseFormRequest
             'business.about' => 'nullable|string',
             'business.web_page' => 'nullable|string',
             'business.identifier_prefix' => 'nullable|string',
+            'business.enable_auto_business_setup' => 'nullable|boolean',
+
             'business.phone' => 'nullable|string',
             // 'business.email' => 'required|string|email|indisposable|max:255|unique:businesses,email',
             'business.email' => 'nullable|string|email|max:255|unique:businesses,email',
@@ -223,6 +225,8 @@ class AuthRegisterBusinessRequest extends BaseFormRequest
             'business.about.string' => 'The about must be a string.',
             'business.web_page.string' => 'The web page must be a string.',
             'business.identifier_prefix.string' => 'The identifier prefix field must be a string.',
+            'business.enable_auto_business_setup.boolean' => 'The identifier prefix field must be a boolean.',
+
 
             'business.phone.string' => 'The phone must be a string.',
             // 'business.email.required' => 'The email field is required.',
