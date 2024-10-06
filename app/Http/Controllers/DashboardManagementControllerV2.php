@@ -2081,6 +2081,80 @@ class DashboardManagementControllerV2 extends Controller
 
         return $data_query->get();
     }
+    public function subscription_enabled_businesses(
+        $today,
+        $start_date_of_next_month,
+        $end_date_of_next_month,
+        $start_date_of_this_month,
+        $end_date_of_this_month,
+        $start_date_of_previous_month,
+        $end_date_of_previous_month,
+        $start_date_of_next_week,
+        $end_date_of_next_week,
+        $start_date_of_this_week,
+        $end_date_of_this_week,
+        $start_date_of_previous_week,
+        $end_date_of_previous_week,
+        $is_active = null
+    ) {
+        // Initial query with optional filtering by active status
+        $data_query = Business::where("created_by", auth()->user()->id)
+        ->where('is_self_registered_businesses', 1);
+
+        return $data_query->get();
+    }
+    public function businesses_expiries(
+        $today,
+        $start_date_of_next_month,
+        $end_date_of_next_month,
+        $start_date_of_this_month,
+        $end_date_of_this_month,
+        $start_date_of_previous_month,
+        $end_date_of_previous_month,
+        $start_date_of_next_week,
+        $end_date_of_next_week,
+        $start_date_of_this_week,
+        $end_date_of_this_week,
+        $start_date_of_previous_week,
+        $end_date_of_previous_week,
+
+    ) {
+// Define expiration intervals in days
+$expires_in_days = [0, 15, 30, 60];
+$today = Carbon::now()->startOfDay(); // Get today's date at the start of the day
+
+// Initialize an array to hold the counts
+$data = [];
+
+foreach ($expires_in_days as $expires_in_day) {
+    // Calculate the query day based on the current day plus the expiration period
+    $query_day = Carbon::now()->addDays($expires_in_day)->endOfDay(); // Get the end of the day for the query day
+
+    // Count the number of businesses based on trail and subscription dates
+    $data[("expires_in_" . $expires_in_day . "_days")] = Business::where("created_by", auth()->user()->id)
+        ->where(function ($subQuery) use ($today, $query_day) {
+            // For active or subscribed businesses
+            $subQuery->where(function ($q) use ($today, $query_day) {
+                $q->where(function ($innerQuery) use ($today) {
+                    // For businesses that are not self-registered
+                    $innerQuery->where('is_self_registered_businesses', 0)
+                        ->whereNotNull('trail_end_date')
+                        ->whereDate('trail_end_date', '>=', $today); // Directly compare trail end date
+                })
+                ->orWhere(function ($q) use ($today, $query_day) {
+                    // Subquery for self-registered businesses
+                    $q->where('is_self_registered_businesses', 1)
+                        ->whereRaw('DATE(GREATEST(trail_end_date, COALESCE(subscriptions.end_date, "1970-01-01"))) BETWEEN ? AND ?', [$today->toDateString(), $query_day->toDateString()]) // Apply date comparison with GREATEST
+                        ->join('subscriptions', 'subscriptions.business_id', '=', 'businesses.id');
+                });
+            });
+        })
+        ->count();
+}
+
+    return $data;
+}
+
 
 
 
@@ -3641,7 +3715,6 @@ class DashboardManagementControllerV2 extends Controller
             $today = today();
 
 
-
             $start_date_of_next_month = Carbon::now()->startOfMonth()->addMonth(1);
             $end_date_of_next_month = Carbon::now()->endOfMonth()->addMonth(1);
             $start_date_of_this_month = Carbon::now()->startOfMonth();
@@ -3658,10 +3731,22 @@ class DashboardManagementControllerV2 extends Controller
 
 
 
+            $data["subscription_enabled_businesses"] = $this->subscription_enabled_businesses(
+                $today,
+                $start_date_of_next_month,
+                $end_date_of_next_month,
+                $start_date_of_this_month,
+                $end_date_of_this_month,
+                $start_date_of_previous_month,
+                $end_date_of_previous_month,
+                $start_date_of_next_week,
+                $end_date_of_next_week,
+                $start_date_of_this_week,
+                $end_date_of_this_week,
+                $start_date_of_previous_week,
+                $end_date_of_previous_week,
 
-
-
-
+            )->count();
 
 
             $data["businesses"] = $this->businesses(
@@ -3714,8 +3799,24 @@ class DashboardManagementControllerV2 extends Controller
                 $start_date_of_previous_week,
                 $end_date_of_previous_week,
                 0
-
             )->count();
+
+            $data["expiries"] = $this->businesses_expiries(
+                $today,
+                $start_date_of_next_month,
+                $end_date_of_next_month,
+                $start_date_of_this_month,
+                $end_date_of_this_month,
+                $start_date_of_previous_month,
+                $end_date_of_previous_month,
+                $start_date_of_next_week,
+                $end_date_of_next_week,
+                $start_date_of_this_week,
+                $end_date_of_this_week,
+                $start_date_of_previous_week,
+                $end_date_of_previous_week,
+                0
+            );
 
 
         // Get last 12 months dates
@@ -3724,7 +3825,8 @@ class DashboardManagementControllerV2 extends Controller
         // Fetch businesses for each month directly
         $chart_data = [];
         foreach ($months as $month) {
-            $chart_data[$month['month']] = Business::where('created_by', auth()->user()->id)
+            $chart_data['month'] = $month['month'];
+            $chart_data['data_count'] = Business::where('created_by', auth()->user()->id)
                 ->whereBetween('created_at', [$month['start_date'], $month['end_date']])
                 ->count();
         }
@@ -3732,9 +3834,9 @@ class DashboardManagementControllerV2 extends Controller
         // Add chart_data to response
         $data["chart_data"] = $chart_data;
 
+        return response()->json($data, 200);
 
 
-            return response()->json($data, 200);
         } catch (Exception $e) {
             return $this->sendError($e, 500, $request);
         }
