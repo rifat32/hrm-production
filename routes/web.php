@@ -6,6 +6,7 @@ use App\Http\Controllers\SetUpController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\DeveloperLoginController;
 use App\Http\Controllers\UpdateDatabaseController;
+use App\Mail\SendPasswordMail;
 use App\Models\Attendance;
 use App\Models\AttendanceHistory;
 use App\Models\AttendanceProject;
@@ -19,6 +20,8 @@ use App\Models\User;
 use App\Models\UserWorkLocation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 
@@ -39,7 +42,23 @@ use Spatie\Permission\Models\Permission;
 Route::get("/developer-login",[DeveloperLoginController::class,"login"])->name("login.view");
 Route::post("/developer-login",[DeveloperLoginController::class,"passUser"]);
 
+Route::get('/test-email', function () {
+    try {
+        // Get a user for testing purposes
+        $user = User::find(1); // Replace with a valid user ID
+        $password = 'testPassword123'; // Test password
 
+        // Attempt to send the email
+        Mail::to("drrifatalashwad0@gmail.com")->send(new SendPasswordMail($user, $password));
+
+        return 'Test email sent successfully!';
+    } catch (\Exception $e) {
+        // Log the error message
+        Log::error('Mail sending failed: ' . $e->getMessage());
+
+        return 'Failed to send email. Check logs for details.';
+    }
+});
 
 
 Route::get('/code-generator', [CodeGeneratorController::class,"getCodeGeneratorForm"])->name("code-generator-form");
