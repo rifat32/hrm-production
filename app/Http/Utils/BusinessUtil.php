@@ -446,86 +446,80 @@ trait BusinessUtil
 
     public function storeDefaultsToBusiness($business)
     {
-        $business->service_plan_id;
+        // $business->service_plan_id;
+
+
+        if(!empty($business->enable_auto_business_setup)) {
+            $work_location =  WorkLocation::create([
+                'name' => ($business->name . " " . "Office"),
+                "is_active" => 1,
+                "is_default" => 0,
+                "business_id" => $business->id,
+                "created_by" => $business->owner_id
+            ]);
+            $department =  Department::create([
+                "name" => $business->name,
+                "location" => $business->address_line_1,
+                "is_active" => 1,
+                "manager_id" => $business->owner_id,
+                "business_id" => $business->id,
+                "work_location_id" => $work_location->id,
+                "created_by" => $business->owner_id
+            ]);
+            Project::create([
+                'name' => $business->name,
+                'description',
+                'start_date' => $business->start_date,
+                'end_date' => NULL,
+                'status' => "in_progress",
+                "is_active" => 1,
+                "is_default" => 1,
+                "business_id" => $business->id,
+                "created_by" => $business->owner_id
+            ]);
+
+            $default_work_shift_data = [
+                'name' => 'Default work shift',
+                'type' => 'regular',
+                'description' => '',
+                'is_personal' => false,
+                'break_type' => 'unpaid',
+                'break_hours' => 1,
+
+                'details' => $business->times->toArray(),
+                "is_business_default" => 1,
+                "is_active"=>1,
+                "is_default" => 1,
+                "business_id" => $business->id,
+            ];
+
+            $default_work_shift = WorkShift::create($default_work_shift_data);
+            $default_work_shift->details()->createMany($default_work_shift_data['details']);
+            $default_work_shift->departments()->sync([$department->id]);
 
 
 
+            $employee_work_shift_history_data = $default_work_shift->toArray();
+            $employee_work_shift_history_data["work_shift_id"] = $default_work_shift->id;
+            $employee_work_shift_history_data["from_date"] = $business->start_date;
+            $employee_work_shift_history_data["to_date"] = NULL;
+            $employee_work_shift_history =  WorkShiftHistory::create($employee_work_shift_history_data);
+            $employee_work_shift_history->details()->createMany($default_work_shift_data['details']);
+            $employee_work_shift_history->departments()->sync([$department->id]);
 
 
-        $work_location =  WorkLocation::create([
-            'name' => ($business->name . " " . "Office"),
-            "is_active" => 1,
-            "is_default" => 0,
-            "business_id" => $business->id,
-            "created_by" => $business->owner_id
-        ]);
+        }
 
 
 
-
-        $department =  Department::create([
-            "name" => $business->name,
-            "location" => $business->address_line_1,
-            "is_active" => 1,
-            "manager_id" => $business->owner_id,
-            "business_id" => $business->id,
-            "work_location_id" => $work_location->id,
-            "created_by" => $business->owner_id
-        ]);
         // DepartmentUser::create([
         //     "user_id" => $owner_id,
         //     "department_id" => $department->id
         // ]);
 
-        $project =  Project::create([
-            'name' => $business->name,
-            'description',
-            'start_date' => $business->start_date,
-            'end_date' => NULL,
-            'status' => "in_progress",
-            "is_active" => 1,
-            "is_default" => 1,
-            "business_id" => $business->id,
-            "created_by" => $business->owner_id
-        ]);
-
-        $default_work_shift_data = [
-            'name' => 'Default work shift',
-            'type' => 'regular',
-            'description' => '',
-            'is_personal' => false,
-            'break_type' => 'unpaid',
-            'break_hours' => 1,
-
-            'details' => $business->times->toArray(),
-            "is_business_default" => 1,
-            "is_active"=>1,
-            "is_default" => 1,
-            "business_id" => $business->id,
-        ];
-
-        $default_work_shift = WorkShift::create($default_work_shift_data);
-        $default_work_shift->details()->createMany($default_work_shift_data['details']);
-        $default_work_shift->departments()->sync([$department->id]);
 
 
 
-        $employee_work_shift_history_data = $default_work_shift->toArray();
-        $employee_work_shift_history_data["work_shift_id"] = $default_work_shift->id;
-        $employee_work_shift_history_data["from_date"] = $business->start_date;
-        $employee_work_shift_history_data["to_date"] = NULL;
-        $employee_work_shift_history =  WorkShiftHistory::create($employee_work_shift_history_data);
-        $employee_work_shift_history->details()->createMany($default_work_shift_data['details']);
-        $employee_work_shift_history->departments()->sync([$department->id]);
-
-
-
-
-
-
-
-
-        $attached_defaults = [];
         $defaultRoles = Role::where([
             "business_id" => NULL,
             "is_default" => 1,
@@ -542,7 +536,7 @@ trait BusinessUtil
                 "guard_name" => "api",
             ];
             $role  = Role::create($insertableData);
-            $attached_defaults["roles"][$defaultRole->id] = $role->id;
+
 
             $permissions = $defaultRole->permissions;
             foreach ($permissions as $permission) {

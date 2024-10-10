@@ -91,3 +91,31 @@ This will give list of affiliation of business with thier expiry date
 
 
 
+
+1. work location (1 default according to business name) ✔️
+2. department (1 default according to business name) ✔️
+3. project (1 default according to business name) ✔️
+4. work shift (1 default according to business timings) ✔️
+All above will be they need to create at least one before moving to next step
+
+
+
+5. role (some default roles) cl❌
+6. email template (system default data copy)✔️
+7. leave setting (1 dafault)
+8. attendance setting (1 dafault)
+9. payrun setting (1 dafault)
+10. payment date setting (1 dafault) ❌
+11. AssetType (multile dafault)
+12. Bank (multile dafault) ✔️
+13. Designation (multile dafault) ✔️
+15. EmploymentStatus (multile dafault) ✔️
+16. JobPlatform (multile dafault) ✔️
+17. JobType (multile dafault) ✔️
+18 LetterTemplate (multile dafault) ✔️
+19 RecruitmentProcess (multile dafault) ✔️
+20. TaskCategory (multile dafault) ❌
+21. TerminationReason (multile dafault) ✔️
+22. TerminationType (multile dafault) ❌
+23. WorkLocation (multile dafault) ✔️
+24. SettingLeaveType (multile dafault) ❌

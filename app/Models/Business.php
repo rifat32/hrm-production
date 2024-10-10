@@ -20,7 +20,7 @@ class Business extends Model
         "about",
         "web_page",
         "identifier_prefix",
-        'enable_auto_business_setup.boolean',
+        'enable_auto_business_setup',
         "phone",
         "email",
         "additional_information",

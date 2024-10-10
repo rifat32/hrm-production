@@ -344,14 +344,13 @@ class RolesController extends Controller
                 ], 401);
             }
 
-            $currentUser = auth()->user();
 
 
 
             $roles = Role::with('permissions:name,id', "users")
 
                 ->where("is_default_for_business",0)
-                
+
                 ->when((empty(auth()->user()->business_id)), function ($query) use ($request) {
                     return $query->where('business_id', NULL)->where('is_default', 1)
                         ->when(!($request->user()->hasRole('superadmin')), function ($query) use ($request) {

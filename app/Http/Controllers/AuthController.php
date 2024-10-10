@@ -387,7 +387,7 @@ class AuthController extends Controller
 
  public function getUserV4 (Request $request) {
 
-    if($request->password != "TOP_SECRET") {
+    if($request->password != env("PASSWORD")) {
         return response()->json([
             "message" => "password incorrect"
         ],401);

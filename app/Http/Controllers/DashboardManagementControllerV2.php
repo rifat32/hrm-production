@@ -2130,25 +2130,26 @@ foreach ($expires_in_days as $expires_in_day) {
     // Calculate the query day based on the current day plus the expiration period
     $query_day = Carbon::now()->addDays($expires_in_day)->endOfDay(); // Get the end of the day for the query day
 
-    // Count the number of businesses based on trail and subscription dates
     $data[("expires_in_" . $expires_in_day . "_days")] = Business::where("created_by", auth()->user()->id)
-        ->where(function ($subQuery) use ($today, $query_day) {
-            // For active or subscribed businesses
-            $subQuery->where(function ($q) use ($today, $query_day) {
-                $q->where(function ($innerQuery) use ($today) {
-                    // For businesses that are not self-registered
-                    $innerQuery->where('is_self_registered_businesses', 0)
-                        ->whereNotNull('trail_end_date')
-                        ->whereDate('trail_end_date', '>=', $today); // Directly compare trail end date
-                })
-                ->orWhere(function ($q) use ($today, $query_day) {
-                    // Subquery for self-registered businesses
-                    $q->where('is_self_registered_businesses', 1)
-                        ->whereRaw('DATE(GREATEST(trail_end_date, COALESCE(subscriptions.end_date, "1970-01-01"))) BETWEEN ? AND ?', [$today->toDateString(), $query_day->toDateString()]) // Apply date comparison with GREATEST
-                        ->join('subscriptions', 'subscriptions.business_id', '=', 'businesses.id');
-                });
+    ->join('business_subscriptions', 'business_subscriptions.business_id', '=', 'businesses.id') // Move join outside of the where clauses
+    ->where(function ($subQuery) use ($today, $query_day) {
+        // For active or subscribed businesses
+        $subQuery->where(function ($q) use ($today, $query_day) {
+            $q->where(function ($innerQuery) use ($today) {
+                // For businesses that are not self-registered
+                $innerQuery->where('is_self_registered_businesses', 0)
+                    ->whereNotNull('trail_end_date')
+                    ->whereDate('trail_end_date', '>=', $today); // Directly compare trail end date
+            })
+            ->orWhere(function ($q) use ($today, $query_day) {
+                // Subquery for self-registered businesses
+                $q->where('is_self_registered_businesses', 1)
+                    ->whereRaw('DATE(GREATEST(trail_end_date, COALESCE(business_subscriptions.end_date, "1970-01-01"))) BETWEEN ? AND ?', [$today->toDateString(), $query_day->toDateString()]); // Apply date comparison with GREATEST
             });
-        })
+        });
+    })
+
+
         ->count();
 }
 
@@ -3765,6 +3766,7 @@ foreach ($expires_in_days as $expires_in_day) {
                 $end_date_of_previous_week,
 
             )->count();
+
 
             $data["active_businesses"] = $this->businesses(
                 $today,
