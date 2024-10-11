@@ -20,4 +20,6 @@ class SystemSetting extends Model
         'STRIPE_KEY',
         "STRIPE_SECRET"
     ];
+
+
 }

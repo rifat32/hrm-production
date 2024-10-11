@@ -10,9 +10,10 @@ use Exception;
 use Illuminate\Http\Request;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
+use Stripe\WebhookEndpoint;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Stripe\WebhookEndpoint;
+
 
 class SubscriptionController extends Controller
 {
@@ -180,4 +181,8 @@ class SubscriptionController extends Controller
     {
         return redirect()->away(env("FRONT_END_URL") . '/auth/login');
     }
+
+
+
+    
 }

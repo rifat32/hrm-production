@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 class SystemSettingController extends Controller
 {
+
     use ErrorUtil,UserActivityUtil;
       /**
      *
