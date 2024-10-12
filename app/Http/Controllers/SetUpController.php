@@ -165,6 +165,8 @@ return "swagger generated";
         $admin->email_verified_at = now();
         $admin->save();
 
+        $this->setupRoles();
+
         $reseller =  User::create([
             'first_Name' => "Shahbaz",
             'last_Name'=> "Khan",
@@ -205,25 +207,6 @@ return "swagger generated";
                 $specialReseller->givePermissionTo($permissions);
 
 
-        // ###############################
-        // permissions
-        // ###############################
-        $permissions =  config("setup-config.permissions");
-        // setup permissions
-        foreach ($permissions as $permission) {
-            if(!Permission::where([
-            'name' => $permission,
-            'guard_name' => 'api'
-            ])
-            ->exists()){
-                Permission::create(['guard_name' => 'api', 'name' => $permission]);
-            }
-
-        }
-
-
-
-
 
 
 
@@ -235,7 +218,7 @@ return "swagger generated";
 
         $this->storeEmailTemplates();
 
-        $this->setupRoles();
+
 
         $this->setupAssetTypes();
 

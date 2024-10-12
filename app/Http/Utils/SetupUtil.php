@@ -64,6 +64,23 @@ trait SetupUtil
     public function setupRoles()
     {
 
+         // ###############################
+        // permissions
+        // ###############################
+        $permissions =  config("setup-config.permissions");
+        // setup permissions
+        foreach ($permissions as $permission) {
+            if(!Permission::where([
+            'name' => $permission,
+            'guard_name' => 'api'
+            ])
+            ->exists()){
+                Permission::create(['guard_name' => 'api', 'name' => $permission]);
+            }
+
+        }
+
+
         // setup roles
         $roles = config("setup-config.roles");
         foreach ($roles as $role) {
