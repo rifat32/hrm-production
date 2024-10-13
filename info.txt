@@ -119,3 +119,20 @@ All above will be they need to create at least one before moving to next step
 22. TerminationType (multile dafault) ❌
 23. WorkLocation (multile dafault) ✔️
 24. SettingLeaveType (multile dafault) ❌
+
+
+
+
+alias zip-laravel='zip -r laravel_backup.zip app bootstrap config database reso>
+git-push() {
+    commit_message=${1:-"update"}
+    branch=${2:-"main"}
+    git add .
+    git commit -m "$commit_message"
+    git push -u origin "$branch"
+}
+alias lampp-start='cd /opt/lampp && sudo ./manager-linux-x64.run'
+alias react-build='NODE_OPTIONS="--max-old-space-size=4096" yarn build'
+
+
+
