@@ -69,6 +69,12 @@
                 <label for="jwtToken">Request time:</label>
               {{$error_log->created_at}}
             </div>
+
+            <div class="form-group">
+                <label for="jwtToken">IP address:</label>
+              {{$error_log->ip_address}}
+            </div>
+
             <div class="form-group">
                 <label for="jwtToken">JWT Token:</label>
                 <input type="text" id="jwtToken" name="jwtToken" required value="">
