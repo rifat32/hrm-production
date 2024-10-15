@@ -70,6 +70,8 @@ class AuthRegisterBusinessRequest extends BaseFormRequest
             'business.about' => 'nullable|string',
             'business.web_page' => 'nullable|string',
             'business.identifier_prefix' => 'nullable|string',
+            'business.pin_code' => 'nullable|string',
+
             'business.enable_auto_business_setup' => 'nullable|boolean',
 
             'business.phone' => 'nullable|string',
@@ -225,6 +227,7 @@ class AuthRegisterBusinessRequest extends BaseFormRequest
             'business.about.string' => 'The about must be a string.',
             'business.web_page.string' => 'The web page must be a string.',
             'business.identifier_prefix.string' => 'The identifier prefix field must be a string.',
+              'business.pin_code.string' => 'The pin code field must be a string.',,
             'business.enable_auto_business_setup.boolean' => 'The identifier prefix field must be a boolean.',
 
 

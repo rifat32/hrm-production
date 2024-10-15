@@ -20,6 +20,7 @@ class Business extends Model
         "about",
         "web_page",
         "identifier_prefix",
+        "pin_code",
         'enable_auto_business_setup',
         "phone",
         "email",
@@ -60,6 +61,9 @@ class Business extends Model
         'pension_scheme_letters' => 'array',
     ];
 
+    protected $hidden = [
+        'pin_code'
+    ];
 
     public function emailSettings()
     {
