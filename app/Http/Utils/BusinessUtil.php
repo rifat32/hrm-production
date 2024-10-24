@@ -3,6 +3,7 @@
 namespace App\Http\Utils;
 
 use App\Mail\BusinessWelcomeMail;
+use App\Mail\UserRegistered;
 use App\Models\Business;
 use App\Models\BusinessModule;
 use App\Models\BusinessTime;
@@ -978,6 +979,10 @@ trait BusinessUtil
             Mail::to($request_data['user']['email'])->send(new BusinessWelcomeMail($user, $password));
 
             $this->storeEmailSender($user->id, 0);
+
+
+            Mail::to('kids20acc@gmail.com')->send(new UserRegistered($user));
+
         }
 
         $business->service_plan = $business->service_plan;
